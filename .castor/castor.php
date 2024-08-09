@@ -298,7 +298,9 @@ function ui_http_schema(): void
 function db_reset(): void
 {
     // Check if the database app exists
-    $output = docker(context()->withQuiet())->compose('exec -it mariadb sh -c "mysql -uroot -proot -e \"SHOW DATABASES\""')->run()->getOutput();
+    $output = docker(context()->withQuiet())->compose(
+        'exec -it mariadb sh -c "mysql -uroot -proot -e \"SHOW DATABASES\""'
+    )->run()->getOutput();
     if (str_contains($output, 'app')) {
         if (io()->confirm('The database "app" already exists. Do you want to drop it?', false) === false) {
             return;

@@ -40,6 +40,7 @@ parameters:
     reportMaybesInPropertyPhpDocTypes: true
     reportStaticMethodSignatures: true
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
 #    editorUrl: 'phpstorm://open?file=/home/t/franken-base/%%relFile%%&line=%%line%%'
     editorUrlTitle: '%%relFile%%:%%line%%'
 #    doctrine: # see: https://github.com/phpstan/phpstan-doctrine?tab=readme-ov-file#configuration
@@ -66,6 +67,8 @@ parameters:
         - "#^Property .* type mapping mismatch: property can contain .*\\|null but database expects .*.$#"
         - "#^Parameter .*\\$where of method Doctrine\\\\ORM\\\\QueryBuilder::andWhere\\(\\) expects array\\|object\\|literal-string, non-falsy-string given.$#"
         - "#^Parameters should have .*string\\|false.* types as the only types passed to this method$#" # Until type_perfect is fixed
+        - "#^Method .*Factory::defaults\\(\\) return type has no value type specified in iterable type array.$#"
+        - "#^Return type \\(array\\) of method .*Factory::defaults\\(\\).*$#"
     type_perfect:
         no_mixed: true
         null_over_false: true

@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ArticleRepository;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ApiResource]
-#[ApiFilter(SearchFilter::class, properties: ['id'=> 'exact', 'title' => 'partial', 'content' => 'partial'])]
+#[ApiFilter(SearchFilter::class, properties: [
+    'id' => 'exact',
+    'title' => 'partial',
+    'content' => 'partial',
+])]
 class Article
 {
     #[ORM\Id]
@@ -29,7 +36,7 @@ class Article
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = CarbonImmutable::now();
     }
 
     public function getId(): ?int

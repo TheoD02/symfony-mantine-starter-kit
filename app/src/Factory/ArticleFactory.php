@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Article;
@@ -15,7 +17,7 @@ final class ArticleFactory extends PersistentProxyObjectFactory
         return Article::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'content' => self::faker()->text(255),
