@@ -60,6 +60,46 @@ export interface paths {
         patch: operations["api_articles_id_patch"];
         trace?: never;
     };
+    "/api/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieves a User resource.
+         * @description Retrieves a User resource.
+         */
+        get: operations["api_logout_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieves a User resource.
+         * @description Retrieves a User resource.
+         */
+        get: operations["api_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth": {
         parameters: {
             query?: never;
@@ -106,6 +146,26 @@ export interface components {
             content?: string;
             /** Format: date-time */
             createdAt?: string;
+        };
+        "User.jsonld": {
+            readonly "@context"?: string | ({
+                "@vocab": string;
+                /** @enum {string} */
+                hydra: "http://www.w3.org/ns/hydra/core#";
+            } & {
+                [key: string]: unknown;
+            });
+            readonly "@id"?: string;
+            readonly "@type"?: string;
+            readonly id?: number;
+            uuid?: string;
+            /** @description The user roles */
+            roles?: string[];
+            /** @description The hashed password */
+            password?: string;
+            spotifyId?: string | null;
+            /** @description A visual identifier that represents this user. */
+            readonly userIdentifier?: string;
         };
     };
     responses: never;
@@ -366,6 +426,60 @@ export interface operations {
             };
             /** @description Unprocessable entity */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_logout_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User resource */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": unknown;
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User resource */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["User.jsonld"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

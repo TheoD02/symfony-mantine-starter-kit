@@ -11,10 +11,12 @@ import {
   PasswordInput,
   TextInput,
   Title,
+  ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { IconBrandSpotifyFilled } from "@tabler/icons-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useContext } from "react";
 
 export const Route = createFileRoute("/auth/login")({
@@ -57,6 +59,15 @@ function Login() {
           Create account
         </Anchor>
       </Text>
+
+      <Group grow mb="md" mt="md">
+        <ActionIcon
+          color="green"
+          onClick={() => (window.location.href = "/connect/spotify")}
+        >
+          <IconBrandSpotifyFilled />
+        </ActionIcon>
+      </Group>
 
       <form onSubmit={form.onSubmit((values) => mutate({ body: values }))}>
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">

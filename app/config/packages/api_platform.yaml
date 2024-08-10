@@ -14,7 +14,7 @@ api_platform:
                 name: Authorization
                 type: header
     defaults:
-        stateless: true
+        stateless: false
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
         extra_properties:

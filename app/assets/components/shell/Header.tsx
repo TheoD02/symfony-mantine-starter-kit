@@ -9,6 +9,8 @@ import {
   ScrollArea,
   rem,
   Menu,
+  Loader,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./Header.module.css";
@@ -19,7 +21,7 @@ import { notifications } from "@mantine/notifications";
 import { IconLogout } from "@tabler/icons-react";
 
 export function Header() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, isAuthenticating } = useContext(AuthContext);
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
@@ -67,10 +69,10 @@ export function Header() {
           </Group>
 
           <Group visibleFrom="sm">
-            {user ? (
+            {user !== null ? (
               <Menu trigger="hover" openDelay={100} closeDelay={400}>
                 <Menu.Target>
-                  <Button color="indigo">{user.email}</Button>
+                  <Button color="indigo">{user.userIdentifier}</Button>
                 </Menu.Target>
                 <Menu.Dropdown>
                   <Menu.Label>Actions</Menu.Label>
@@ -87,10 +89,19 @@ export function Header() {
               </Menu>
             ) : (
               <>
-                <Button component={Link} to="/auth/login" variant="default">
+                <Button
+                  component={Link}
+                  to="/auth/login"
+                  variant="default"
+                  loading={isAuthenticating}
+                >
                   Log in
                 </Button>
-                <Button component={Link} to="/auth/register">
+                <Button
+                  component={Link}
+                  to="/auth/register"
+                  loading={isAuthenticating}
+                >
                   Sign up
                 </Button>
               </>
