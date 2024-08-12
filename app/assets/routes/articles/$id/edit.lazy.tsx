@@ -1,9 +1,10 @@
 import $api from '@/api/api';
 import { components } from '@/api/schema';
-import { Button, Group, Loader, Textarea, TextInput } from '@mantine/core';
+import { queryClient } from '@/app';
+import { Button, Group, Skeleton, Textarea, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod';
 
 export const Route = createLazyFileRoute('/articles/$id/edit')({
@@ -18,7 +19,7 @@ const schema = z.object({
 function EditArticleLoader() {
   const params = Route.useParams();
 
-  const { data: article, isLoading } = $api.useQuery('get', '/api/articles/{id}', {
+  const { data: article, isFetching } = $api.useQuery('get', '/api/articles/{id}', {
     params: {
       path: {
         id: params.id,
@@ -26,14 +27,21 @@ function EditArticleLoader() {
     },
   });
 
-  if (isLoading) {
-    return <Loader/>;
+  if (isFetching) {
+    return <>
+      <Skeleton height={10} width={50} mb={8} />
+      <Skeleton height={35} mb={8} />
+      <Skeleton height={10} mb={8} />
+      <Skeleton height={50} mb={8} />
+      <Skeleton height={35} width={100} />
+    </>;
   }
 
-  return <EditArticle articleId={params.id} article={article} />; // ODO: fix type :/
+  return <EditArticle articleId={params.id} article={article} />; // TODO: fix type :/
 }
 
-function EditArticle({articleId, article}: { articleId: string, article: components["schemas"]["Article.jsonld"] }) {
+function EditArticle({ articleId, article }: { articleId: string, article: components["schemas"]["Article.jsonld"] }) {
+  const navigate = useNavigate();
   const form = useForm({
     initialValues: {
       title: article.title,
@@ -43,17 +51,19 @@ function EditArticle({articleId, article}: { articleId: string, article: compone
     validate: zodResolver(schema),
   });
 
-  const { mutate } = $api.useMutation("patch", "/api/articles/{id}", {
+  const { mutate, isPending: isArticleUpdating } = $api.useMutation("patch", "/api/articles/{id}", {
     onSuccess: () => {
       notifications.show({
         title: "Article updated",
         message: "Article updated successfully",
       });
+      navigate({ to: "/articles" })
+      queryClient.invalidateQueries({ queryKey: ["get", "/api/articles/{$id}", articleId] });
     },
   });
 
   return (
-    <form onSubmit={form.onSubmit((values) => mutate({ body: values, params: {path: {id: articleId}}}))}>
+    <form onSubmit={form.onSubmit((values) => mutate({ body: values, params: { path: { id: articleId } } }))}>
       <TextInput
         withAsterisk
         label="Title"
@@ -67,8 +77,8 @@ function EditArticle({articleId, article}: { articleId: string, article: compone
         {...form.getInputProps("content")}
       />
       <Group justify="flex-start" mt="md">
-        <Button type="submit">Update</Button>
+        <Button type="submit" loading={isArticleUpdating} dela>Update</Button>
       </Group>
-    </form>
+    </form >
   );
 }

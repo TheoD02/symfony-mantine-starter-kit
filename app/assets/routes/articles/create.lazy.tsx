@@ -1,9 +1,10 @@
 import { Button, Group, Textarea, TextInput } from "@mantine/core";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
 import $api from "@/api/api";
 import { notifications } from "@mantine/notifications";
+import { queryClient } from "@/app";
 
 export const Route = createLazyFileRoute("/articles/create")({
   component: CreateArticle,
@@ -15,6 +16,7 @@ const schema = z.object({
 });
 
 function CreateArticle() {
+  const navigate = useNavigate();
   const form = useForm({
     initialValues: {
       title: "",
@@ -24,12 +26,14 @@ function CreateArticle() {
     validate: zodResolver(schema),
   });
 
-  const { mutate } = $api.useMutation("post", "/api/articles", {
+  const { mutate, isPending: isArticleSubmitting } = $api.useMutation("post", "/api/articles", {
     onSuccess: () => {
       notifications.show({
         title: "Article created successfully",
         message: "Check your email for the confirmation link",
       });
+      navigate({ to: "/articles" });
+      queryClient.invalidateQueries({ queryKey: ["get", "/api/articles"] });
     },
   });
 
@@ -48,7 +52,7 @@ function CreateArticle() {
         {...form.getInputProps("content")}
       />
       <Group justify="flex-start" mt="md">
-        <Button type="submit">Submit</Button>
+        <Button type="submit" loading={isArticleSubmitting}>Submit</Button>
       </Group>
     </form>
   );

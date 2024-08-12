@@ -41,9 +41,6 @@ function Articles() {
         content: columnFilters.find((f) => f.id === "content")?.value ?? "",
       }),
     },
-    queryOptions: {
-      queryKey: ["get", "/api/articles"],
-    },
   });
 
   const columns = useMemo<
