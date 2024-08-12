@@ -38,11 +38,11 @@ function start(bool $force = false): void
     }
 
     if (
-        ! delayed_fingerprint(
-            callback: static fn () => docker()
+        !delayed_fingerprint(
+            callback: static fn() => docker()
                 ->compose('--profile', 'app', 'build', '--no-cache')
                 ->run(),
-            fingerprint: static fn () => fgp()->php_docker(),
+            fingerprint: static fn() => fgp()->php_docker(),
             force: $force
         )
     ) {
@@ -72,10 +72,10 @@ function install(bool $force = false): void
 
     io()->title('Installing dependencies');
     io()->section('Composer');
-    $forceVendor = $force || ! is_dir(context()->workingDirectory . '/vendor');
-    if (! delayed_fingerprint(
-        callback: static fn () => composer()->install()->run(),
-        fingerprint: static fn () => fgp()->composer(),
+    $forceVendor = $force || !is_dir(context()->workingDirectory . '/vendor');
+    if (!delayed_fingerprint(
+        callback: static fn() => composer()->install()->run(),
+        fingerprint: static fn() => fgp()->composer(),
         force: $forceVendor || $force
     )) {
         io()->note('Composer dependencies are already installed.');
@@ -86,21 +86,21 @@ function install(bool $force = false): void
     io()->section('QA tools');
     qa()->install();
 
-    db_reset();
+    io()->section('NPM');
+    $forceNodeModules = $force || !is_dir(context()->workingDirectory . '/node_modules');
+    if (!delayed_fingerprint(
+        callback: static fn() => pnpm()->install()->run(),
+        fingerprint: static fn() => fgp()->npm(),
+        force: $forceNodeModules || $force
+    )) {
+        io()->note('NPM dependencies are already installed.');
+    } else {
+        io()->success('NPM dependencies installed');
+    }
 
-    //    io()->section('NPM');
-    //    $forceNodeModules = $force || ! is_dir(context()->workingDirectory . '/node_modules');
-    //    if (! delayed_fingerprint(
-    //        callback: static fn () => pnpm()->install()->run(),
-    //        fingerprint: static fn () => fgp()->npm(),
-    //        force: $forceNodeModules || $force
-    //    )) {
-    //        io()->note('NPM dependencies are already installed.');
-    //    } else {
-    //        io()->success('NPM dependencies installed');
-    //    }
-    //
-    //    pnpm()->add('run', 'build')->run();
+    pnpm()->add('run', 'build')->run();
+
+    db_reset();
 
     notify('Dependencies installed');
 }
@@ -126,8 +126,7 @@ function shell(
         ->add('--user', 'www-data')
         ->add('app', 'fish')
         ->addIf($command !== null, '-c', "\"{$command}\"")
-        ->run()
-    ;
+        ->run();
 }
 
 /** @noinspection t */
@@ -145,7 +144,7 @@ function generate_domain_dir(string $domainName): void
         return;
     }
 
-    if (! mkdir($domainDirectory) && ! is_dir($domainDirectory)) {
+    if (!mkdir($domainDirectory) && !is_dir($domainDirectory)) {
         throw new RuntimeException(sprintf('Directory "%s" was not created', $domainDirectory));
     }
 
@@ -176,28 +175,28 @@ function generate_domain_dir(string $domainName): void
 
     foreach ($directoryStructure as $dir => $subDirs) {
         $dir = $domainDirectory . '/' . $dir;
-        if (! mkdir($dir) && ! is_dir($dir)) {
+        if (!mkdir($dir) && !is_dir($dir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
 
-        if (! empty($subDirs)) {
+        if (!empty($subDirs)) {
             create_dirs($subDirs, $dir);
         }
     }
 
     io()->success("Domain directory {$domainName} created");
-    io()->listing(array_map(static fn ($key) => $domainDirectory . '/' . $key, array_keys($directoryStructure)));
+    io()->listing(array_map(static fn($key) => $domainDirectory . '/' . $key, array_keys($directoryStructure)));
 }
 
 function create_dirs(array $dirs, string $baseDir): void
 {
     foreach ($dirs as $dirname => $subDirs) {
         $dir = $baseDir . '/' . $dirname;
-        if (! mkdir($dir) && ! is_dir($dir)) {
+        if (!mkdir($dir) && !is_dir($dir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
 
-        if (! empty($subDirs)) {
+        if (!empty($subDirs)) {
             create_dirs($subDirs, $dir);
         }
     }
@@ -215,8 +214,7 @@ function import_sql(): void
         ->name('*.sql')
         ->name('*.sql.gz')
         ->sortByName()
-        ->getIterator()
-    ;
+        ->getIterator();
 
     $selectedDump = io()->choice('Select the SQL file to import', iterator_to_array($sqlFiles), $sqlFilename);
 
@@ -246,8 +244,7 @@ function ui_format(): void
         ->add('--user', 'www-data')
         ->add('--workdir', '/app/assets')
         ->add('app', 'npx', '@biomejs/biome', 'format', '--write', './src')
-        ->run()
-    ;
+        ->run();
 }
 
 #[AsTask(name: 'ui:lint')]
@@ -258,8 +255,7 @@ function ui_lint(): void
         ->add('--user', 'www-data')
         ->add('--workdir', '/app/assets')
         ->add('app', 'npx', '@biomejs/biome', 'lint', './src')
-        ->run()
-    ;
+        ->run();
 }
 
 #[AsTask(name: 'ui:ts')]
@@ -271,8 +267,7 @@ function ui_ts(bool $fix = false): void
         ->add('--user', 'www-data')
         ->add('--workdir', '/app/assets')
         ->add('app', 'pnpm', 'run', $run)
-        ->run()
-    ;
+        ->run();
 }
 
 #[AsTask(name: 'ui:http:schema')]
@@ -290,8 +285,7 @@ function ui_http_schema(): void
             '-o',
             './src/api/schema.d.ts'
         )
-        ->run()
-    ;
+        ->run();
 }
 
 #[AsTask(name: 'db:reset')]
