@@ -12,7 +12,7 @@ class ContainerDefinitionBag
     {
         return new ContainerDefinition(
             composeName: 'app',
-            name: 'mantine-starter-kit-app-1',
+            name: 'symfony-mantine-starter-kit-app-1',
             workingDirectory: '/app',
             user: 'www-data'
         );
@@ -31,7 +31,7 @@ class ContainerDefinitionBag
     {
         return new ContainerDefinition(
             composeName: 'app',
-            name: 'mantine-starter-kit-app-1',
+            name: 'symfony-mantine-starter-kit-app-1',
             workingDirectory: '/app',
             user: 'www-data'
         );

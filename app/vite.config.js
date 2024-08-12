@@ -38,12 +38,12 @@ export default defineConfig({
     //     usePolling: true,
     // },
     host: true,
-    port: 3150,
+    port: 3151,
     hmr: {
       protocol: "ws",
       host: "localhost",
-      port: 3150,
-      clientPort: 3150,
+      port: 3151,
+      clientPort: 3151,
     },
   },
 });

@@ -16,8 +16,8 @@ services:
       dockerfile: ./.docker/php/Dockerfile
       target: dev
     ports:
-      - "3150:3150"
-      - "11112:11112"
+      - "3151:3151"
+      - "11113:11113"
     environment:
       SERVER_NAME: ":80"
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
@@ -57,7 +57,7 @@ services:
   mariadb:
     image: mariadb:10.5
     ports:
-      - "3350:3306"
+      - "3351:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
