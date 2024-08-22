@@ -5,4 +5,5 @@ RUN apk add --no-cache \
 
 RUN pip install markdown-callouts
 
-HEALTHCHECK --start-period=60s CMD curl -f http://localhost:8000 || exit 1
+HEALTHCHECK --interval=30s --timeout=10s \
+  CMD curl --fail http://localhost:8000 || exit 1
