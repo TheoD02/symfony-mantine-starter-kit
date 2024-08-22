@@ -18,6 +18,7 @@ use function Castor\run;
 use function TheoD\MusicAutoTagger\delayed_fingerprint;
 use function TheoD\MusicAutoTagger\docker;
 use function TheoD\MusicAutoTagger\fgp;
+use function TheoD\MusicAutoTagger\root_context;
 use function TheoD\MusicAutoTagger\Runner\composer;
 use function TheoD\MusicAutoTagger\Runner\pnpm;
 use function TheoD\MusicAutoTagger\Runner\qa;
@@ -39,8 +40,17 @@ function start(bool $force = false): void
 
     if (
         !delayed_fingerprint(
-            callback: static fn() => docker()
-                ->compose('--profile', 'app', 'build', '--no-cache')
+            callback: static fn() => docker(root_context())
+                ->compose(
+                    '-f',
+                    'compose.yaml',
+                    '-f',
+                    'compose.dev.yaml',
+                    '--profile',
+                    'app',
+                    'build',
+                    '--no-cache'
+                )
                 ->run(),
             fingerprint: static fn() => fgp()->php_docker(),
             force: $force
@@ -49,7 +59,17 @@ function start(bool $force = false): void
         io()->note('Docker images are already built.');
     }
 
-    docker()->compose('--profile', 'app', 'up', '-d', '--wait')->run();
+    docker(root_context())->compose(
+        '-f',
+        'compose.yaml',
+        '-f',
+        'compose.dev.yaml',
+        '--profile',
+        'app',
+        'up',
+        '-d',
+        '--wait'
+    )->run();
 }
 
 #[AsTask]
