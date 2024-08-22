@@ -129,7 +129,7 @@ ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY --link ./.docker/php/app.prod.ini $PHP_INI_DIR/conf.d/
+COPY --link ./.docker/php/conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
 COPY --link ./.docker/php/worker.Caddyfile /etc/caddy/worker.Caddyfile
 
 # prevent the reinstallation of vendors at every changes in the source code
