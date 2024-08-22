@@ -5,7 +5,7 @@ services:
       dockerfile: ./.docker/php/Dockerfile
       target: prod
 
-  mkdocs:
-    build:
-      dockerfile: ./.docker/mkdocs/Dockerfile
-      context: .
+#  mkdocs:
+#    build:
+#      dockerfile: ./.docker/mkdocs/Dockerfile
+#      context: .
