@@ -54,9 +54,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
-COPY --link ./docker/php/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
+COPY --link ./.docker/php/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 #COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-COPY --link ./docker/php/Caddyfile /etc/caddy/Caddyfile
+COPY --link ./.docker/php/Caddyfile /etc/caddy/Caddyfile
 
 #ENTRYPOINT ["docker-entrypoint"]
 
@@ -89,7 +89,7 @@ RUN set -eux; \
 #        pcov \
     ;
 
-COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
+COPY --link ./.docker/php/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 RUN echo "xdebug.mode=debug,develop,profile" >> $PHP_INI_DIR/conf.d/.docker-php-ext-xdebug.ini \
     && echo "xdebug.start_with_request=trigger" >> $PHP_INI_DIR/conf.d/.docker-php-ext-xdebug.ini \

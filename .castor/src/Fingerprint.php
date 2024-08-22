@@ -15,9 +15,9 @@ class Fingerprint
             ->writeFile(path('.docker/php/dev-entrypoint.sh', root_context()))
             ->writeFile(path('.docker/php/Caddyfile', root_context()))
             ->writeFile(path('.docker/php/worker.Caddyfile', root_context()))
-            ->writeFile(path('.docker/php/conf.d/app.ini', root_context()))
-            ->writeFile(path('.docker/php/conf.d/app.dev.ini', root_context()))
-            ->writeFile(path('.docker/php/conf.d/app.prod.ini', root_context()))
+            ->writeFile(path('.docker/php/conf.d/10-app.ini', root_context()))
+            ->writeFile(path('.docker/php/conf.d/20-app.dev.ini', root_context()))
+            ->writeFile(path('.docker/php/conf.d/20-app.prod.ini', root_context()))
             ->finish()
         ;
     }
