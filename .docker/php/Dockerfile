@@ -3,6 +3,9 @@ FROM dunglas/frankenphp:latest-php8.3.7 AS frankenphp
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
+
+VOLUME /app/var/
+
 USER root
 
 RUN apt-get update && apt-get install -y \
@@ -49,8 +52,13 @@ RUN set -eux; \
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY --link ./.docker/php/Caddyfile /etc/caddy/Caddyfile
-COPY --link ./.docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
+ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
+
+COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
+#COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY --link frankenphp/Caddyfile /etc/caddy/Caddyfile
+
+#ENTRYPOINT ["docker-entrypoint"]
 
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
@@ -60,7 +68,7 @@ FROM frankenphp AS dev-base
 ENV PHPSTAN_PRO_WEB_PORT=11112
 EXPOSE 11112
 
-COPY ./.docker/php/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 # Install fish shell
 ARG XDG_CONFIG_HOME=/home/www-data/.config
@@ -80,6 +88,8 @@ RUN set -eux; \
         xdebug \
 #        pcov \
     ;
+
+COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 RUN echo "xdebug.mode=debug,develop,profile" >> $PHP_INI_DIR/conf.d/.docker-php-ext-xdebug.ini \
     && echo "xdebug.start_with_request=trigger" >> $PHP_INI_DIR/conf.d/.docker-php-ext-xdebug.ini \
@@ -129,21 +139,21 @@ ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY --link ./.docker/php/conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
+COPY --link ./.docker/php/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 COPY --link ./.docker/php/worker.Caddyfile /etc/caddy/worker.Caddyfile
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
-    composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 # copy sources
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
 RUN set -eux; \
-    mkdir -p var/cache var/log; \
-    composer dump-autoload --classmap-authoritative --no-dev; \
-    composer dump-env prod; \
-    composer run-script --no-dev post-install-cmd; \
-    chmod +x bin/console; sync;
+	mkdir -p var/cache var/log; \
+	composer dump-autoload --classmap-authoritative --no-dev; \
+	composer dump-env prod; \
+	composer run-script --no-dev post-install-cmd; \
+	chmod +x bin/console; sync;
