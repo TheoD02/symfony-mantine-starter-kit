@@ -1,23 +1,5 @@
-x-worker-template:
-  worker_template: &worker_template
-    build:
-      context: .
-      dockerfile: ./.docker/php/Dockerfile
-      target: worker-dev
-    volumes:
-      - ./app:/app
-    profiles:
-      - worker
-
 services:
   app:
-    build:
-      context: .
-      dockerfile: ./.docker/php/Dockerfile
-      target: dev
-    ports:
-      - "3151:3151"
-      - "11113:11113"
     environment:
       SERVER_NAME: ":80"
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
@@ -29,41 +11,17 @@ services:
       MERCURE_PUBLIC_URL: https://${SERVER_NAME:-localhost}/.well-known/mercure
       MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
     volumes:
-#      - "/mnt/d/Users/Theo/Music/ONLY ONE:/music"
-#      - "/home/theo/Music/MUSIC_ONLY_ONE:/music"
-      - ./app:/app
-      - ./tools:/tools
-      - ./.castor:/.castor
-      - ~/.ssh:/home/www-data/.ssh:ro
-      - user_data:/home/www-data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.network=traefik"
-      - "traefik.http.routers.php-mantine-starter-kit.rule=Host(`mantine-starter-kit.web.localhost`)"
-      - "traefik.http.routers.php-mantine-starter-kit.tls=true"
-      - "traefik.http.services.php-mantine-starter-kit.loadbalancer.server.port=80"
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       - database
-      - traefik
-    profiles:
-      - app
-    extra_hosts:
-      - host.docker.internal:host-gateway
-
-  #scheduler:
-  #  <<: *worker_template
-  #  command: php /app/bin/console messenger:consume scheduler_default -vv
 
   mariadb:
     image: mariadb:10.5
-    ports:
-      - "3351:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - mariadb:/var/lib/mysql
-    profiles:
-      - app
     networks:
       - database
 
@@ -73,28 +31,17 @@ services:
       context: .
     volumes:
       - ./:/docs
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mkdocs-mantine-starter-kit.rule=Host(`mantine-starter-kit.docs.localhost`)"
-      - "traefik.http.routers.mkdocs-mantine-starter-kit.tls=true"
-      - "traefik.http.services.mkdocs-mantine-starter-kit.loadbalancer.server.port=8000"
-    networks:
-      - traefik
-    profiles:
-      - app
 
 networks:
   database:
-  traefik:
-    external: true
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 
 volumes:
-  g4f_cookies:
-  user_data:
+  caddy_data:
+  caddy_config:
   mariadb:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
