@@ -23,18 +23,15 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 class SpotifyAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
     public function __construct(
-        private readonly ClientRegistry         $clientRegistry,
+        private readonly ClientRegistry $clientRegistry,
         private readonly EntityManagerInterface $entityManager,
-    )
-    {
+    ) {
     }
 
     public function supports(Request $request): ?bool
     {
         // continue ONLY if the current ROUTE matches the check ROUTE
-        return $request->attributes->get(
-                '_route'
-            ) === 'connect_spotify_check';
+        return $request->attributes->get('_route') === 'connect_spotify_check';
     }
 
     public function authenticate(Request $request): Passport
@@ -62,18 +59,14 @@ class SpotifyAuthenticator extends OAuth2Authenticator implements Authentication
             $this->entityManager->flush();
         }
 
-        return new SelfValidatingPassport(
-            new UserBadge($user->getUuid()),
-            [(new RememberMeBadge())->enable()]
-        );
+        return new SelfValidatingPassport(new UserBadge($user->getUuid()), [(new RememberMeBadge())->enable()]);
     }
 
     public function onAuthenticationSuccess(
-        Request        $request,
+        Request $request,
         TokenInterface $token,
-        string         $firewallName
-    ): RedirectResponse
-    {
+        string $firewallName
+    ): RedirectResponse {
         return new RedirectResponse('/');
     }
 
@@ -88,10 +81,7 @@ class SpotifyAuthenticator extends OAuth2Authenticator implements Authentication
      * Called when authentication is needed, but it's not sent.
      * This redirects to the 'login'.
      */
-    public function start(
-        Request                  $request,
-        ?AuthenticationException $authException = null
-    ): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return new RedirectResponse(
             '/connect/', // might be the site, where users choose their oauth provider

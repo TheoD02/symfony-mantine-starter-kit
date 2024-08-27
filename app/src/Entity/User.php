@@ -16,18 +16,17 @@ use Symfony\Component\Uid\Uuid;
 
 #[ApiResource(
     operations: [
-        new Get(
-            uriTemplate: '/me',
-            provider: MeProvider::class,
-        ),
+        new Get(uriTemplate: '/me', provider: MeProvider::class),
         new Get(
             uriTemplate: '/logout',
             routePrefix: '',
-            defaults: ['user' => null],
+            defaults: [
+                'user' => null,
+            ],
             controller: UserController::class,
             input: false,
             output: false,
-        )
+        ),
     ],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -86,7 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->uuid;
+        return (string) $this->uuid;
     }
 
     /**

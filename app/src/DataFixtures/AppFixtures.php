@@ -14,6 +14,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         UserFactory::new()->create([
+            'email' => 'admin@domain.tld', // TODO: change to a real email
             'password' => '$2y$13$TtOASv6QIXDWg2XULGESdOplFVRFcINUJvPULKKi6MW9LZFRwsKTi', // admin
             'roles' => ['ROLE_USER'],
         ]);

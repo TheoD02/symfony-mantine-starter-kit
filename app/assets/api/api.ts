@@ -6,16 +6,27 @@ const fetchClient = createFetchClient<paths>({
   baseUrl: "https://mantine-starter-kit.web.localhost/",
 });
 const contentTypeBasedOnHttpMethod: Middleware = {
-  async onRequest(req) {
-    if (req.request.method === "PATCH") {
-      req.request.headers.set("Content-Type", "application/merge-patch+json");
+  async onRequest({ request }) {
+    if (request.method === "PATCH") {
+      request.headers.set("Content-Type", "application/merge-patch+json");
     } else {
-      req.request.headers.set("Content-Type", "application/ld+json");
+      request.headers.set("Content-Type", "application/ld+json");
     }
   },
 };
 
+const injectApiToken: Middleware = {
+  async onRequest({ request }) {
+    const token = localStorage.getItem("token");
+
+    if (token && token !== "null") {
+      request.headers.set("Authorization", `Bearer ${token.replaceAll('"', '')}`)
+    }
+  }
+}
+
 fetchClient.use(contentTypeBasedOnHttpMethod);
+fetchClient.use(injectApiToken);
 const $api = createClient(fetchClient);
 
 export default $api;
